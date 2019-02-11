@@ -85,18 +85,18 @@ public class block : MonoBehaviour {
         if (collision.tag == this.tag)
         {
             pe.forceMagnitude = attraction;
-            Debug.Log(this.name + "Attraction");
+           // Debug.Log(this.name + "Attraction");
         }
         else if (collision.tag != this.tag)
         {
             pe.forceMagnitude = repulsion;
-            Debug.Log(this.name + "Repulsion");
+           // Debug.Log(this.name + "Repulsion");
         }
 
         else
         {
             pe.forceMagnitude = 0;
-            Debug.Log(this.name + "No power is working");
+           // Debug.Log(this.name + "No power is working");
         }
     }
 
