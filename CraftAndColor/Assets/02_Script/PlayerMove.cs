@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerMove : MonoBehaviour {
-   
+public class PlayerMove : MonoBehaviour
+{
+
     public bool jump = true;
     Rigidbody2D rb;
- 
+
 
     public float jumpForce = 22f;       // ジャンプ時に加える力  Force applied at jump
     public float jumpThreshold = 1f;    // ジャンプ中か判定するための閾値 Threshold for judging whether jumping is in progress
@@ -24,7 +25,7 @@ public class PlayerMove : MonoBehaviour {
     public Color NowColor;
     public Collider2D blockCol;
     public GameObject ChaildBlock;
-    public Sprite standing, running, jumping, standb,runb,jumpb,separate;
+    public Sprite standing, running, jumping, standb, runb, jumpb, separate;
     public Sprite redb, greenb, blueb, purpleb, orangeb, yellowb;
     public AudioClip[] audioClips;
     private AudioSource audioSource;
@@ -43,7 +44,7 @@ public class PlayerMove : MonoBehaviour {
         this.rb = this.gameObject.GetComponent<Rigidbody2D>();
         audioSource = gameObject.GetComponent<AudioSource>();
         //this.animator = GetComponent<Animator>();
-        
+
     }
 
     void Update()
@@ -58,6 +59,7 @@ public class PlayerMove : MonoBehaviour {
 
         Havingblock();  //ブロックを持つためのメソッド
         ColorChange();  //ブロックの色を変えるためのメソッド
+        ColorChangeByAnalogStick();
     }
 
     void GetInputKey()
@@ -66,24 +68,25 @@ public class PlayerMove : MonoBehaviour {
         else this.gameObject.GetComponent<SpriteRenderer>().sprite = running;
         key = 0;
 
-        if (Input.GetAxisRaw("Horizontal") < 0) {
+        if (Input.GetAxisRaw("Horizontal") < 0)
+        {
             key = -1;
             keyStatus = key;
         };
-       
+
         if (Input.GetAxisRaw("Horizontal") > 0)
         {
             key = 1;
             keyStatus = key;
         };
-        
+
     }
 
     void ChangeState()
     {
         // 空中にいるかどうかの判定。上下の速度(rigidbody.velocity)が一定の値を超えている場合、空中とみなす
         // Determining whether it is in the air. If the upper and lower speed (rigidbody.velocity) exceeds a certain value, it is regarded as being in the air
-        
+
         if (Mathf.Abs(rb.velocity.y) > jumpThreshold)
         {
             isGround = false;
@@ -96,7 +99,7 @@ public class PlayerMove : MonoBehaviour {
             if (key == 0)
             {
                 state = "IDLE"; //待機状態 Standby state
-                if(having) this.gameObject.GetComponent<SpriteRenderer>().sprite = standb;
+                if (having) this.gameObject.GetComponent<SpriteRenderer>().sprite = standb;
                 else this.gameObject.GetComponent<SpriteRenderer>().sprite = standing;
             }
             else
@@ -112,7 +115,7 @@ public class PlayerMove : MonoBehaviour {
             {
                 state = "JUMP";
                 if (having) this.gameObject.GetComponent<SpriteRenderer>().sprite = jumpb;
-                else if (Toseparate)this.gameObject.GetComponent<SpriteRenderer>().sprite = separate;
+                else if (Toseparate) this.gameObject.GetComponent<SpriteRenderer>().sprite = separate;
                 else this.gameObject.GetComponent<SpriteRenderer>().sprite = jumping;
                 // 下降中 Falling
             }
@@ -134,21 +137,21 @@ public class PlayerMove : MonoBehaviour {
             switch (state)
             {
                 case "JUMP":
-                    
+
                     stateEffect = 0.5f;
                     break;
                 case "FALL":
-                    
+
                     stateEffect = 0.5f;
                     break;
                 case "RUN":
-                   
+
                     stateEffect = 1f;
                     //GetComponent<SpriteRenderer> ().flipX = true;
-                    transform.localScale = new Vector3(2.4f * key , transform.localScale.y, 1); // 向きに応じてキャラクターのspriteを反転 Flip character sprite according to orientation
+                    transform.localScale = new Vector3(2.4f * key, transform.localScale.y, 1); // 向きに応じてキャラクターのspriteを反転 Flip character sprite according to orientation
                     break;
                 default:
-                   
+
                     stateEffect = 1f;
                     break;
             }
@@ -163,15 +166,15 @@ public class PlayerMove : MonoBehaviour {
         if (isGround)
         {
             if (Toseparate) Toseparate = false;
-            if (Input.GetKey(KeyCode.UpArrow) || Input.GetButtonDown("X")) 
+            if (Input.GetKey(KeyCode.UpArrow) || Input.GetButtonDown("X"))
             {
                 audioSource.clip = audioClips[0];
                 audioSource.Play();
                 if (having) this.gameObject.GetComponent<SpriteRenderer>().sprite = jumpb;
-                else if (Toseparate)this.gameObject.GetComponent<SpriteRenderer>().sprite = separate;
+                else if (Toseparate) this.gameObject.GetComponent<SpriteRenderer>().sprite = separate;
                 else this.gameObject.GetComponent<SpriteRenderer>().sprite = jumping;
                 this.rb.AddForce(transform.up * this.jumpForce);
-				//se01.PlayOneShot (se01.clip);
+                //se01.PlayOneShot (se01.clip);
                 isGround = false;
             }
         }
@@ -182,11 +185,11 @@ public class PlayerMove : MonoBehaviour {
 
         if (speedX < this.runThreshold)
         {
-             this.rb.AddForce(transform.right * key * this.runForce * stateEffect); //未入力の場合は key の値が0になるため移動しない
-             //transform.localScale = new Vector3(key, 1, 1); // 向きに応じてキャラクターのspriteを反転
+            this.rb.AddForce(transform.right * key * this.runForce * stateEffect); //未入力の場合は key の値が0になるため移動しない
+                                                                                   //transform.localScale = new Vector3(key, 1, 1); // 向きに応じてキャラクターのspriteを反転
         }
         else
-        {      
+        {
             this.transform.position += new Vector3(runSpeed * Time.deltaTime * key * stateEffect, 0, 0);
             //transform.localScale = new Vector3(key, 1, 1); // 向きに応じてキャラクターのspriteを反転
         }
@@ -202,7 +205,7 @@ public class PlayerMove : MonoBehaviour {
             {
                 Debug.Log("□ボタン押したで");
                 //blockCol.gameObject.GetComponent<BoxCollider2D>().isTrigger = true;
-                blockCol.gameObject.GetComponent<Transform>().transform.position = new Vector3(this.transform.position.x, this.transform.position.y-0.8f, 0);//this.transform.position;
+                blockCol.gameObject.GetComponent<Transform>().transform.position = new Vector3(this.transform.position.x, this.transform.position.y - 0.8f, 0);//this.transform.position;
                 blockCol.gameObject.GetComponent<Rigidbody2D>().simulated = false;
                 blockCol.gameObject.GetComponentInParent<block>().liftBlock(this.transform);
                 blockCol.gameObject.GetComponent<SpriteRenderer>().enabled = false;
@@ -243,11 +246,11 @@ public class PlayerMove : MonoBehaviour {
                 }
             }
 
-            else if(having && isGround)
+            else if (having && isGround)
             {
                 blockCol.gameObject.GetComponentInParent<block>().downBlock(this.transform);
                 //blockCol.gameObject.GetComponent<BoxCollider2D>().isTrigger = false;
-                blockCol.gameObject.GetComponent<Transform>().transform.position = new Vector3(this.transform.position.x, this.transform.position.y -2.0f, 0);//this.transform.position;
+                blockCol.gameObject.GetComponent<Transform>().transform.position = new Vector3(this.transform.position.x, this.transform.position.y - 2.0f, 0);//this.transform.position;
                 blockCol.gameObject.GetComponent<Rigidbody2D>().simulated = true;
                 blockCol.gameObject.GetComponent<SpriteRenderer>().enabled = true;
                 blockCol.gameObject.GetComponent<SpriteRenderer>().color = NowColor;
@@ -265,8 +268,143 @@ public class PlayerMove : MonoBehaviour {
                 Toseparate = true;
             }
         }
-        
+
     }
+
+
+    public static float MapFromDegreeToRGB(float val, float degreeMin, float degreeFullBegin, float degreeFullEnd, float degreeMax, float rgbMin, float rgbMax)
+    {
+        if (degreeFullEnd < degreeFullBegin && (val >= degreeFullBegin || val <= degreeFullEnd))
+        {
+            return rgbMax;
+        }
+        else if (val >= degreeFullBegin && val <= degreeFullEnd)
+        {
+            return rgbMax;
+        }
+        else if (val < degreeMin && val > degreeMax)
+        {
+            return rgbMin;
+        }
+        else if (val >= degreeMin && val < degreeFullBegin)
+        {
+            return Mathf.Lerp(rgbMax, rgbMin, Mathf.InverseLerp(degreeFullBegin, degreeMin, val));
+        }
+        else if (val > degreeFullEnd && val <= degreeMax)
+        {
+            return Mathf.Lerp(rgbMax, rgbMin, Mathf.InverseLerp(degreeFullEnd, degreeMax, val));
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    void ColorChangeByAnalogStick()
+    {
+        float horizontal = Input.GetAxis("Axis 3");
+        float vertical = Input.GetAxis("Axis 6");
+
+        bool analogStickIsNotDead = Mathf.Abs(horizontal) + Mathf.Abs(vertical) > 1;
+
+        if (having && analogStickIsNotDead)
+        {
+            float absAtan2 = Mathf.Atan2(horizontal, vertical);
+            if (horizontal < 0)
+            {
+                absAtan2 = 2 * Mathf.PI + absAtan2;
+            }
+            print((absAtan2 * 180 / Mathf.PI));
+
+            float absDegree = (absAtan2 * 180 / Mathf.PI);
+
+            float red = MapFromDegreeToRGB(absDegree, 240 + 60, 300 + 60, 60 + 60, 120 + 60, 0, 1);
+            float green = MapFromDegreeToRGB(absDegree, 0 + 60, 60 + 60, 180 + 60, 240 + 60, 0, 1);
+            float blue = MapFromDegreeToRGB(absDegree, 120 + 60, 180 + 60, 300 + 60, 60, 0, 1);
+
+            if (absDegree > 0 && absDegree < 60)
+            {
+                blue = MapFromDegreeToRGB(absDegree, 120 + 60, 180 + 60, 0, 60, 0, 1);
+
+            }
+
+            Color selectedColor = new Color(red, green, blue);
+
+            Vector3 selectedColorVector = new Vector3(red, green, blue);
+
+            Vector3 redVector = new Vector3(1, 0, 0);
+            Vector3 orangeVector = new Vector3(1, 1, 0);
+            Vector3 yellowVector = new Vector3(0, 1, 0);
+            Vector3 greenVector = new Vector3(0, 1, 1);
+            Vector3 blueVector = new Vector3(0, 0, 1);
+            Vector3 purpleVector = new Vector3(1, 0, 1);
+
+            List<Vector3> allColors = new List<Vector3> { redVector, orangeVector, yellowVector, greenVector, blueVector, purpleVector };
+
+            Vector3 minDeltaVector = Vector3.zero;
+            float minDeltaMagnitude = float.PositiveInfinity;
+            for (int i = 0; i < allColors.Count; i++)
+            {
+                float delta = (allColors[i] - selectedColorVector).magnitude;
+                if (delta < minDeltaMagnitude)
+                {
+                    minDeltaVector = allColors[i];
+                    minDeltaMagnitude = delta;
+                }
+            }
+
+            Color newColor = new Color();
+            string newTag = "";
+            Sprite newSprite = null;
+            if (minDeltaVector == redVector)
+            {
+                newColor = new Color(1, 0.6352941f, 0.6352941f, 1);
+                newTag = "red";
+                newSprite = redb;
+            }
+            else if (minDeltaVector == orangeVector)
+            {
+                newColor = new Color(1, 0.7294118f, 0.4235294f, 1);
+                newTag = "orange";
+                newSprite = orangeb;
+            }
+            else if (minDeltaVector == yellowVector)
+            {
+                newColor = new Color(1, 1, 0.7411765f, 1);
+                newTag = "yellow";
+                newSprite = yellowb;
+            }
+            else if (minDeltaVector == greenVector)
+            {
+                newColor = new Color(0.7372549f, 0.937255f, 0.7019608f, 1);
+                newTag = "green";
+                newSprite = greenb;
+            }
+            else if (minDeltaVector == blueVector)
+            {
+                newColor = new Color(0.7411765f, 0.8666667f, 1, 1);
+                newTag = "blue";
+                newSprite = blueb;
+            }
+            else if (minDeltaVector == purpleVector)
+            {
+                newColor = new Color(0.9058824f, 0.7019608f, 0.937255f, 1);
+                newTag = "purple";
+                newSprite = purpleb;
+            }
+            if (newTag != blockCol.gameObject.tag)
+            {
+                audioSource.clip = audioClips[1];
+                audioSource.Play();
+
+                NowColor = newColor;
+                blockCol.gameObject.tag = newTag;
+                standb = newSprite;
+            }
+
+        }
+    }
+
 
     //ブロックを持った状態だと、色を変えられる
     void ColorChange()
@@ -284,7 +422,7 @@ public class PlayerMove : MonoBehaviour {
                 CCCount += 1;
             }
 
-            else　if (CCCount == 2)
+            else if (CCCount == 2)
             {
                 NowColor = new Color(0.7372549f, 0.937255f, 0.7019608f, 1);
                 blockCol.gameObject.tag = "green";
@@ -329,13 +467,14 @@ public class PlayerMove : MonoBehaviour {
     // 着地判定 Landing determination
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (!isGround)isGround = true;
+        if (!isGround) isGround = true;
 
-        if (col.collider.tag == "red" || col.collider.tag == "blue" || col.collider.tag == "green" || col.collider.tag == "yellow" 
+        if (col.collider.tag == "red" || col.collider.tag == "blue" || col.collider.tag == "green" || col.collider.tag == "yellow"
             || col.collider.tag == "purple" || col.collider.tag == "orange")
 
         {
-            if (having == false){
+            if (having == false)
+            {
                 canHave = true;
                 blockCol = col.collider;
 
@@ -345,7 +484,7 @@ public class PlayerMove : MonoBehaviour {
 
     private void OnCollisionStay2D(Collision2D col)
     {
-        if (col.collider.tag == "red" || col.collider.tag == "blue" || col.collider.tag == "green" || col.collider.tag == "yellow" 
+        if (col.collider.tag == "red" || col.collider.tag == "blue" || col.collider.tag == "green" || col.collider.tag == "yellow"
             || col.collider.tag == "purple" || col.collider.tag == "orange")
 
         {
@@ -358,5 +497,5 @@ public class PlayerMove : MonoBehaviour {
         canHave = false;
     }
 
-    
+
 }
